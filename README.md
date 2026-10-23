@@ -7,6 +7,7 @@ SLOW PAPER 논문 일기(`paper-diary`) 밖의 **확장 과제 전용 레포** �
 | 디렉토리 | 과제 | 상태 |
 |---|---|---|
 | `e2e-multimodal-rt/` | E2E 멀티모달 실시간 에이전트 (시각+청각+액션, RT-2/V-JEPA 2 근거) | 🟡 팩트시트+실습 기록 완료, 퀘스트 11/04 예정 |
+| `av-driving-e2e/` | 🤖 멀티모달 자율주행 E2E **실제 구현** — 멀티 에이전트 분할 (A 비전 · B 오디오 · C 융합/리샘플러 · D 정책/액션) | 🟡 **Interface Contract v1.0 고정** + 계약 테스트 7/7 통과 (`tests/test_interface_v1.py`) |
 
 ## 규약 (paper-diary와 동일 계승)
 
