@@ -8,7 +8,7 @@
 | 상수 | 값 | 출처 |
 |---|---|---|
 | BATCH | B (변수, 테스트 기본 2) | — |
-| LLM_HIDDEN (H) | **896** | [라벨-a] Qwen2.5-0.5B-Instruct 선택(학생 확정) — config 검증 전 건합 |
+| LLM_HIDDEN (H) | **896** | 백본 선택(Qwen2.5-0.5B-Instruct) = [라벨-a] 학생 확정 · hidden 수치 자체 = [라벨-b] 공식 config 본검증 전 |
 | VISION_PATCH_TOKENS | **576** (24² = (336/14)²) | CLIP ViT-L/14@336 — LLaVA-1.5와 동일 계열 조건([라벨-a]) |
 | VISION_DIM (Dv) | 1024 | CLIP ViT-L 마지막 블록 차원 — [라벨-b] config 본검증 필요 |
 | VIDEO_FPS | 10 | [라벨-a] 실용 기본치 (teacher 미지정) |
@@ -61,8 +61,8 @@ D_ACT   "st thr" 2 출력 토큰 → 256 bin 역산 → (steer, throttle) 지속
 |---|---|---|
 | `test_vision_skeleton` | A | 32프레임 주입 → 유지 (32,576,Dv); 40프레임 → 창 초과분 날림 후 (32,576,Dv) |
 | `test_audio_skeleton` | B | 5 s 파형 → (250, Da) 고정; frame t↔audio t 타임스탬프 오차 ≤ 0.1 s |
-| `test_resampler_compression` | C | 입력 27 (과축) 토큰 vs 33,632 @똑같이 → 출력 (32, H) 둘 다; **그 변하지 않음 = O(N²) 차단 증명** |
-| `test_action_roundtrip` | D | 중점 복원: max\|x−detok(x)\| ≤ 1/510 (bin폭/2); EMA α 출력 지터 ≤ 0.3× 입력 지터 |
+| `test_resampler_compression` | C | 입력 극한값 T=5 → 3,130 토큰 vs T=32 → 18,682 토큰 (T·576+250) → 출력 (32, H) 둘 다; **그 변하지 않음 = O(N²) 차단 증명** |
+| `test_action_roundtrip` | D | 중점 복원: max\|x−detok(x)\| ≤ 1/510 (bin폭/2, 이론 상한 — 테스트·데모 D는 bin폭 2/255 기준 진술이며 관측 3.3e-3 ≤ 0.0078 정합); EMA α 출력 지터 **입력 지터 미만 감소** (테스트는 jy<jx; 실측 ≈0.6× @α=0.3 — 데모 C) |
 
 ## 4. 라벨 요약 (정직 선언)
 
