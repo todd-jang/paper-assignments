@@ -121,6 +121,9 @@
             text-align: left;
             color: #cbd5e1;
         }
+        .poster-table th:last-child, .poster-table td:last-child {
+            white-space: nowrap;
+        }
         .poster-table th {
             background: #1e3a8a;
             color: #38bdf8;
@@ -344,7 +347,7 @@
                         <strong>Perceiver Resampler:</strong> cross-attention fuses
                         <span class="shape">C_IN: (T&middot;576 + 250, 1024)</span> + 0/1 modality-type tokens
                         into <span class="shape"><strong>C_OUT: (32, 896)</strong> — ALWAYS this shape</span>,
-                        regardless of input length (27 tokens or 33,632 tokens: same output).
+                        regardless of input length (test extremes: 3,130 tokens vs 18,682 tokens → same output).
                     </p>
                 </div>
                 <div class="proof-box">
@@ -363,7 +366,7 @@
                         <strong>Qwen-LLM backbone:</strong> semantic priors + open-set reasoning on prompt = text tokens ⊕ (32, 896) latents<br>
                         <strong>Action tokenizer:</strong> continuous steering ∙ throttle → 2 output tokens "st thr" →
                         <strong>256-bin midpoint restore</strong> (≤ bin-width/2 error; beats RT-2 floor restore per our demo D) →
-                        <strong>EMA α = 0.3</strong> low-pass (jitter ≤ 0.3× input; α=0.1 path-error ×8.3 in closed loop)
+                        <strong>EMA α = 0.3</strong> low-pass (output jitter &lt; input, measured ≈0.6×; α=0.1 path-RMS ×8.3 in open-loop toy — demo C)
                     </p>
                 </div>
                 <div class="arch-arrow">↓ control commands</div>
@@ -382,7 +385,7 @@
                 <ul>
                     <li><strong>Perceiver bottleneck:</strong> cross-attention keeps global context while discarding micro-noise — a fixed latent horizon (32) instead of unbounded token growth.</li>
                     <li><strong>Behavioral cloning via 256-bin discretization:</strong> continuous control becomes a language-model-friendly token prediction problem (RT-2 §3.2 legacy).</li>
-                    <li><strong>Metric restoration discipline:</strong> bin-midpoint default (floor-restore sign bias → cumulative drift, RMS ×20 penalty observed at K=256) + EMA α=0.3 (carried over from demo evidence, RT-2 §3.2).</li>
+                    <li><strong>Metric restoration discipline:</strong> bin-midpoint default (floor-restore sign bias → cumulative drift, RMS ×20 penalty observed at K=256) + EMA α=0.3 (our demo-C proposal; 256-bin discretization per RT-2 §3.2).</li>
                 </ul>
             </div>
             <div class="card">
@@ -391,8 +394,8 @@
                     <tr><th>Test (contract)</th><th>Pass condition</th></tr>
                     <tr><td>Vision skeleton</td><td>32 frames in → (32,576,Dv); 40 frames → excess dropped, same shape</td></tr>
                     <tr><td>Audio skeleton</td><td>5 s waveform → (250,Da) fixed; timestamp error ≤ 0.1 s</td></tr>
-                    <tr><td>Resampler compression</td><td>27 vs 33,632 input tokens → (32,H) both — non-change = O(N<sup>2</sup>) block proof</td></tr>
-                    <tr><td>Action roundtrip</td><td>max|x−detok(x)| ≤ 1/510; EMA output jitter ≤ 0.3× input</td></tr>
+                    <tr><td>Resampler compression</td><td>3,130 vs 18,682 input tokens → (32,H) both — non-change = O(N<sup>2</sup>) block proof</td></tr>
+                    <tr><td>Action roundtrip</td><td>max|x−detok(x)| ≤ bin-width (2/255); EMA output jitter strictly &lt; input</td></tr>
                 </table>
                 <p style="margin-top:4px;"><strong>Contract test suite: 7/7 PASS</strong> (mock-proven). Real torch implementations inherit qualification by passing these same tests.</p>
             </div>
